@@ -32,8 +32,8 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
-    public User handleUpdateUser(Long id, User postmanUser) {
-        Optional<User> user = this.userRepository.findById(id);
+    public User handleUpdateUser(User postmanUser) {
+        Optional<User> user = this.userRepository.findById(postmanUser.getId());
         if (user.isPresent()) {
             user.get().setName(postmanUser.getName());
             user.get().setEmail(postmanUser.getEmail());
