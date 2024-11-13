@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.tdat.jobhunter.domain.User;
 import vn.tdat.jobhunter.service.UserService;
+import vn.tdat.jobhunter.service.error.IdInvalidException;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,12 +12,12 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
 
 @RestController
 public class UserController {
@@ -25,15 +26,17 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
+
     @PostMapping("/users")
     public ResponseEntity<User> getUser(@RequestBody User postmanUser) {
         User user = this.userService.handleCreateUser(postmanUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
-    
+
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable("id") long id)
-    {
+    public ResponseEntity<String> deleteUser(@PathVariable("id") long id) throws IdInvalidException {
+        if (id > 1500)
+            throw new IdInvalidException("Id không lớn hơn 1500");
         this.userService.deleteUserById(id);
         return ResponseEntity.ok("done");
     }
@@ -48,7 +51,7 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUser() {
-        return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUser()) ;
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUser());
     }
 
     @PutMapping("/users")
@@ -56,5 +59,5 @@ public class UserController {
         User user = this.userService.handleUpdateUser(postmanUser);
         return ResponseEntity.ok(user);
     }
-    
+
 }
