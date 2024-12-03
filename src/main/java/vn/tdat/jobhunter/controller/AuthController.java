@@ -9,19 +9,26 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import vn.tdat.jobhunter.domain.dto.LoginDTO;
+import vn.tdat.jobhunter.domain.dto.ResLoginDTO;
+import vn.tdat.jobhunter.util.SecurityUtil;
 
 @RestController
 public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagementBuiler;
+    private final SecurityUtil securityUtil;
 
-    public AuthController(AuthenticationManagerBuilder authenticationManagementBuiler) {
+    public AuthController(AuthenticationManagerBuilder authenticationManagementBuiler, SecurityUtil securityUtil) {
         this.authenticationManagementBuiler = authenticationManagementBuiler;
+        this.securityUtil = securityUtil;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginDTO> login(@RequestBody @Valid LoginDTO login) throws MethodInvocationException {
+    public ResponseEntity<ResLoginDTO> login(@RequestBody @Valid LoginDTO login) throws MethodInvocationException {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword());
         Authentication authentication = authenticationManagementBuiler.getObject().authenticate(authenticationToken);
-        return ResponseEntity.ok().body(login);
+        String accessToken = this.securityUtil.createToken(authentication);
+        ResLoginDTO resLoginDTO = new ResLoginDTO();
+        resLoginDTO.setAccessToken(accessToken);
+        return ResponseEntity.ok().body(resLoginDTO);
     }
 }
