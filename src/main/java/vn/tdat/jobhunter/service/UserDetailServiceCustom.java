@@ -21,6 +21,8 @@ public class UserDetailServiceCustom implements UserDetailsService{
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         vn.tdat.jobhunter.domain.User user = userRepository.findByEmail(username);
+        if (user == null)
+            throw new UsernameNotFoundException("Không tìm thấy user");
         return new User(user.getEmail(),
                 user.getPassword(),
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));

@@ -2,6 +2,8 @@ package vn.tdat.jobhunter.util.error;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,12 +14,12 @@ import java.util.List;
 
 @RestControllerAdvice
 public class GlobalException {
-       @ExceptionHandler(value = IdInvalidException.class)
-       public ResponseEntity<RestResponse<Object>> exception(IdInvalidException idInvalidException) {
+       @ExceptionHandler(value = {IdInvalidException.class, BadCredentialsException.class, UsernameNotFoundException.class} )
+       public ResponseEntity<RestResponse<Object>> exception(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(idInvalidException.getMessage());
-        res.setMessage("IdInvalidException");
+        res.setError(ex.getMessage());
+        res.setMessage("Exception occurs...");
         return ResponseEntity.badRequest().body(res);
     }
 
